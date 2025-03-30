@@ -1,26 +1,58 @@
 package repository
 
 import (
-	"context"
+	"lhon/postgres-rest/internal/models"
 	"log"
 	"os"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 
-var DB *pgxpool.Pool
+var DB *gorm.DB
 
 
 func InitDB() {
-    var err error
-    connStr := os.Getenv("DATABASE_URL")
-    DB, err = pgxpool.New(context.Background(), connStr)
+     err := godotenv.Load()
     if err != nil {
-        log.Fatalf("Unable to connect to database: %v\n", err)
+        log.Fatal("Error loading .env file")
     }
+    dsn := "host=" + os.Getenv("DB_HOST") +
+        " user=" + os.Getenv("DB_USER") +
+        " password=" + os.Getenv("DB_PASSWORD") +
+        " dbname=" + os.Getenv("DB_NAME") +
+        " port=" + os.Getenv("DB_PORT") +
+        " sslmode=" + os.Getenv("DB_SSLMODE")
+
+
+    db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+    if err != nil {
+        log.Fatal("Failed to connect to database: ", err)
+    }
+
+    DB = db
+
+	// Auto-migrate the User model
+	if err := DB.AutoMigrate(&models.User{}); err != nil {
+		log.Fatal("Failed to migrate database: ", err)
+	}
+
+    log.Println("Database connected successfully")
 }
 
 func CloseDB() {
-    DB.Close()
+  // Get the underlying *sql.DB object
+	sqlDB, err := DB.DB()
+	if err != nil {
+		log.Fatal("Failed to get sql.DB: ", err)
+	}
+
+	// Close the database connection pool
+	if err := sqlDB.Close(); err != nil {
+		log.Fatal("Failed to close database connection: ", err)
+	}
+
+	log.Println("Database connection closed successfully")
 }
