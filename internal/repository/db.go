@@ -18,7 +18,6 @@ var DB *gorm.DB
 func InitDB() {
      err := godotenv.Load(filepath.Join(".", ".env"))
     if err != nil {
-		println("errororrrs")
         log.Fatal("Error loading .env file")
     }
     dsn := "host=" + os.Getenv("DB_HOST") +
@@ -27,7 +26,7 @@ func InitDB() {
         " dbname=" + os.Getenv("DB_NAME") +
         " port=" + os.Getenv("DB_PORT") +
         " sslmode=" + os.Getenv("DB_SSLMODE")
-
+	
 
     db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
     if err != nil {
@@ -36,8 +35,8 @@ func InitDB() {
 
     DB = db
 
-	// Auto-migrate the User model
-	if err := DB.AutoMigrate(&models.User{}); err != nil {
+	// Auto-migrate the User model and Note model
+	if err := DB.AutoMigrate(&models.User{} , &models.Note{}); err != nil {
 		log.Fatal("Failed to migrate database: ", err)
 	}
 
