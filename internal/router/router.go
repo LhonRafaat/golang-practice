@@ -1,6 +1,8 @@
 package router
 
 import (
+	"lhon/postgres-rest/internal/router/routes"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,11 +12,9 @@ func SetupRouter() *gin.Engine{
 
 	router:=gin.Default()
 
-	router.GET("/notes", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello World",
-		})
-	})
+	noteRoutes:=router.Group("/notes")
+
+	routes.RegisterNoteRoutes(noteRoutes)
 
 	return router
 }
