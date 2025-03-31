@@ -4,6 +4,7 @@ import (
 	"lhon/postgres-rest/internal/models"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -15,8 +16,9 @@ var DB *gorm.DB
 
 
 func InitDB() {
-     err := godotenv.Load()
+     err := godotenv.Load(filepath.Join(".", ".env"))
     if err != nil {
+		println("errororrrs")
         log.Fatal("Error loading .env file")
     }
     dsn := "host=" + os.Getenv("DB_HOST") +
