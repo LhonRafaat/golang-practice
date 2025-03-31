@@ -1,13 +1,18 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"lhon/postgres-rest/internal/handler"
+	"lhon/postgres-rest/internal/repository"
+	"lhon/postgres-rest/internal/services"
+
+	"github.com/gin-gonic/gin"
+)
 
 
 func RegisterNoteRoutes(router *gin.RouterGroup) {
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"result": []string{"nots"},
-			"isSuccess": true,
-		})
-	})
+	  noteRepo := repository.NewNoteRepository(repository.DB)
+    noteService := services.NewNoteService(noteRepo)
+    noteHandler := handler.NewNoteHandler(noteService)
+
+	router.GET("/",noteHandler.GetAllNotes)
 }
